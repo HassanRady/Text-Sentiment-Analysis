@@ -1,10 +1,3 @@
-
-
-
-
-
-
-
 import tensorflow as tf
 from tfx import v1 as tfx
 
@@ -18,11 +11,11 @@ from tfx.components import SchemaGen
 from tfx.components import StatisticsGen
 from tfx.components import Trainer
 from tfx.components import Transform
-from tfx.orchestration import metadata
-from tfx.orchestration.beam.beam_dag_runner import BeamDagRunner
-from tfx.proto import example_gen_pb2
 from tfx.proto import pusher_pb2
-from tfx.proto import trainer_pb2
+# from tfx.orchestration import metadata
+# from tfx.orchestration.beam.beam_dag_runner import BeamDagRunner
+# from tfx.proto import example_gen_pb2
+# from tfx.proto import trainer_pb2
 
 
 def _create_pipeline(pipeline_name: str, pipeline_root: str, data_root: str,
@@ -63,40 +56,40 @@ def _create_pipeline(pipeline_name: str, pipeline_root: str, data_root: str,
       eval_args=tfx.proto.EvalArgs(num_steps=200))
 
 #  # Get the latest blessed model for model validation.
-#   model_resolver = tfx.dsl.Resolver(
-#       strategy_class=tfx.dsl.experimental.LatestBlessedModelStrategy,
-#       model=tfx.dsl.Channel(type=tfx.types.standard_artifacts.Model),
-#       model_blessing=tfx.dsl.Channel(
-#           type=tfx.types.standard_artifacts.ModelBlessing)).with_id(
-#               'latest_blessed_model_resolver')
+  model_resolver = tfx.dsl.Resolver(
+      strategy_class=tfx.dsl.experimental.LatestBlessedModelStrategy,
+      model=tfx.dsl.Channel(type=tfx.types.standard_artifacts.Model),
+      model_blessing=tfx.dsl.Channel(
+          type=tfx.types.standard_artifacts.ModelBlessing)).with_id(
+              'latest_blessed_model_resolver')
 
-#   # Uses TFMA to compute evaluation statistics over features of a model and
-#   # perform quality validation of a candidate model (compared to a baseline).
-#   eval_config = tfma.EvalConfig(
-#       model_specs=[tfma.ModelSpec(label_key='sentiment')],
-#       slicing_specs=[tfma.SlicingSpec()],
-#       metrics_specs=[
-#           tfma.MetricsSpec(metrics=[
-#               tfma.MetricConfig(
-#                   class_name='BinaryAccuracy',
-#                   threshold=tfma.MetricThreshold(
-#                       value_threshold=tfma.GenericValueThreshold(
-#                           # Increase this threshold when training on complete
-#                           # dataset.
-#                           lower_bound={'value': 0.01}),
-#                       # Change threshold will be ignored if there is no
-#                       # baseline model resolved from MLMD (first run).
-#                       change_threshold=tfma.GenericChangeThreshold(
-#                           direction=tfma.MetricDirection.HIGHER_IS_BETTER,
-#                           absolute={'value': -1e-2})))
-#           ])
-#       ])
+  # Uses TFMA to compute evaluation statistics over features of a model and
+  # perform quality validation of a candidate model (compared to a baseline).
+  eval_config = tfma.EvalConfig(
+      model_specs=[tfma.ModelSpec(label_key='sentiment')],
+      slicing_specs=[tfma.SlicingSpec()],
+      metrics_specs=[
+          tfma.MetricsSpec(metrics=[
+              tfma.MetricConfig(
+                  class_name='BinaryAccuracy',
+                  threshold=tfma.MetricThreshold(
+                      value_threshold=tfma.GenericValueThreshold(
+                          # Increase this threshold when training on complete
+                          # dataset.
+                          lower_bound={'value': 0.01}),
+                      # Change threshold will be ignored if there is no
+                      # baseline model resolved from MLMD (first run).
+                      change_threshold=tfma.GenericChangeThreshold(
+                          direction=tfma.MetricDirection.HIGHER_IS_BETTER,
+                          absolute={'value': -1e-2})))
+          ])
+      ])
 
-#   evaluator = Evaluator(
-#       examples=example_gen.outputs['examples'],
-#       model=trainer.outputs['model'],
-#       baseline_model=model_resolver.outputs['model'],
-#       eval_config=eval_config)
+  evaluator = Evaluator(
+      examples=example_gen.outputs['examples'],
+      model=trainer.outputs['model'],
+      baseline_model=model_resolver.outputs['model'],
+      eval_config=eval_config)
 
   # Checks whether the model passed the validation steps and pushes the model
   # to a file destination if check passed.
@@ -114,8 +107,8 @@ def _create_pipeline(pipeline_name: str, pipeline_root: str, data_root: str,
       example_validator,
       transform,
       trainer,
-    #   model_resolver,
-    #   evaluator,
+      model_resolver,
+      evaluator,
       pusher,
   ]
 

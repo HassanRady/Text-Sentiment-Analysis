@@ -37,6 +37,7 @@ FROM python:3.9
 WORKDIR /sentiment-model
 
 RUN pip install --upgrade pip
+RUN pip install tea "cup >= 3.13"
 COPY ./requirements.txt .
 RUN pip install -r requirements.txt
 
